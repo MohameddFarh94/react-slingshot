@@ -1,17 +1,33 @@
 version: 2.1
 
 jobs:
-  say-hello:
-
+  build:
     docker:
       - image: cimg/base:stable
     steps:
       - checkout
-      - run:
-          name: "Say hello"
-          command: "echo Hello, World!"
+      - run: npm i
+      - run: npm run lint
+  test:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - run: npm i 
+      - run: npm run test
+  analyze:
+    docker: cimg/base:stable
+  steps:
+    - checkout
+    - run: npm audit
 
 workflows:
-  say-hello-workflow:
+  my-workflow:
     jobs:
-      - say-hello
+      - build
+      - test
+          requires: 
+            - build
+      - analyze
+          requires:
+            - test
